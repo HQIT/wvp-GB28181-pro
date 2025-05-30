@@ -1,3 +1,6 @@
 [submodule "be.teletask.onvif-java"]
 	path = be.teletask.onvif-java
 	url = https://gitee.com/pan648540858/be.teletask.onvif-java.git
+[submodule "gb28181-client"]
+	path = gb28181-client
+	url = https://github.com/wydpp/gb28181-client.git
