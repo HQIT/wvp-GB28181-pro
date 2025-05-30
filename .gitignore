@@ -28,3 +28,6 @@ hs_err_pid*
 
 /src/main/resources/static/
 certificates
+
+docker/volumes/*
+docker/nginx/dist/*

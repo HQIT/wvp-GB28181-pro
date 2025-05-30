@@ -46,21 +46,22 @@ sip:
   domain: 3402000000
   # [可选]
   id: 34020000002000000001
-  password:
+  password: 123456
   alarm: true
+  show-ip: 192.168.1.68
 
 # 默认服务器配置
 media:
-  id: polaris
+  id: ecnu-trafficai-media
   # [必须修改] ZLM 内网IP与端口
   ip: ${ZLM_HOST:127.0.0.1}
   http-port: ${ZLM_PORT:6080}
   # [可选] 返回流地址时的ip，置空使用 media.ip
   stream-ip: ${STREAM_HOST:127.0.0.1}
   # [可选] wvp在国标信令中使用的ip，此ip为摄像机可以访问到的ip， 置空使用 media.ip
-  sdp-ip: ${SIP_HOST:127.0.0.1}
+  sdp-ip: 192.168.1.68 #${SIP_HOST:127.0.0.1}
   # [可选] Hook IP, 默认使用sip.ip
-  hook-ip: ${SIP_HOST:127.0.0.1}
+  hook-ip: 192.168.1.68 #${SIP_HOST:127.0.0.1}
   # [可选] sslport
   http-ssl-port: 4443
   rtp-proxy-port: 10000
@@ -83,6 +84,7 @@ media:
   record-day: 7
   record-assist-port: 0
 user-settings:
+    sip-log: true
     auto-apply-play: true
     play-timeout: 30000
     wait-track: false
@@ -100,6 +102,9 @@ user-settings:
       - http://localhost:8080
       - http://127.0.0.1:8080
       - http://0.0.0.0:8080
+      - http://localhost:18080
+      - http://127.0.0.1:18080
+      - http://0.0.0.0:18080
       - ${NGINX_HOST}
 logging:
   config: classpath:logback-spring.xml

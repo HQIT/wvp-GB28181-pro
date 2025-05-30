@@ -1,0 +1,42 @@
+# 前端构建阶段
+FROM dockerpull.pw/node:16-alpine AS frontend-builder
+
+WORKDIR /build
+
+# 复制前端依赖和源码
+COPY ./web ./
+
+RUN npm --registry=https://registry.npmmirror.com install
+RUN npm run build:prod
+
+# 后端构建阶段
+FROM dockerpull.pw/maven:3.8-openjdk-8 AS backend-builder
+
+WORKDIR /build
+
+# 复制并安装 kingbase 驱动
+COPY ./libs/jdbc-aarch/kingbase8-8.6.0.jar /build/libs/jdbc-aarch/
+COPY ./libs/jdbc-x86/kingbase8-8.6.0.jar /build/libs/jdbc-x86/
+RUN mvn install:install-file -Dfile=/build/libs/jdbc-aarch/kingbase8-8.6.0.jar -DgroupId=com.kingbase -DartifactId=kingbase8 -Dversion=8.6.0 -Dpackaging=jar && \
+    mvn install:install-file -Dfile=/build/libs/jdbc-x86/kingbase8-8.6.0.jar -DgroupId=com.kingbase -DartifactId=kingbase8 -Dversion=8.6.0 -Dpackaging=jar
+
+# 复制后端依赖和源码
+COPY ./pom.xml ./
+COPY ./src ./src
+COPY --from=frontend-builder /build/dist ./src/main/resources/static
+
+RUN mvn dependency:go-offline
+RUN mvn clean package -Dmaven.test.skip=true
+
+# 运行阶段
+FROM dockerpull.pw/openjdk:8-jre-alpine
+WORKDIR /opt/wvp
+COPY --from=backend-builder /build/target/*.jar /opt/wvp/wvp.jar
+RUN mkdir -p /opt/wvp/logs
+EXPOSE 18978 8116/udp 8116/tcp
+ENV TZ=Asia/Shanghai
+RUN apk add --no-cache tzdata && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
+ENV JAVA_OPTS="-Xms512m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/wvp/logs/"
+CMD java $JAVA_OPTS -jar /opt/wvp/wvp.jar --spring.config.location=/opt/wvp/wvp/application.yml
