@@ -29,7 +29,7 @@ RUN mvn dependency:go-offline
 RUN mvn clean package -Dmaven.test.skip=true
 
 # 运行阶段
-FROM dockerpull.pw/openjdk:8-jre-alpine
+FROM dockerpull.pw/openjdk:8-jdk-alpine
 WORKDIR /opt/wvp
 COPY --from=backend-builder /build/target/*.jar /opt/wvp/wvp.jar
 RUN mkdir -p /opt/wvp/logs

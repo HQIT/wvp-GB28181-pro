@@ -25,6 +25,7 @@ hs_err_pid*
 /target/*
 /.idea/
 /target/
+docker-export/
 
 /src/main/resources/static/
 certificates

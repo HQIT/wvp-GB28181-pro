@@ -35,7 +35,9 @@ RUN mkdir -p /app/extracted && \
     rm /app/app.jar && \
     mkdir -p /app/config && \
     cp /app/extracted/BOOT-INF/classes/application-dev.yml /app/config/
-
+RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list && \
+    apt-get update && apt-get install -y ffmpeg && \
+    rm -rf /var/lib/apt/lists/*
 ENV SPRING_CONFIG_LOCATION=/app/config/application-dev.yml
 
 ENTRYPOINT ["java", "-cp", "/app/extracted/BOOT-INF/classes:/app/extracted/BOOT-INF/lib/*", "com.wydpp.GB28181ClientApplication"] 
